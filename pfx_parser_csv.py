@@ -22,6 +22,7 @@ from urllib.request import urlopen
 import os
 import datetime
 import time
+import lxml
 
 
 pitch_outfile=open("pitch_table.csv", "a+", encoding='utf-8')
@@ -38,7 +39,7 @@ else:
 	startdate_choice_fl=""
 	while startdate_choice_fl!="yes" and startdate_choice_fl!="no":
 		startdate_choice_fl=input("Choose starting date? Type yes or no: ")
-		
+
 	if startdate_choice_fl=="yes":
 		start_year = int(input("Starting year: "))
 		start_month = int(input("Starting month: "))
@@ -49,8 +50,8 @@ else:
 
 enddate_choice_fl=""
 while enddate_choice_fl!="yes" and enddate_choice_fl!="no":
-	enddate_choice_fl=input("Choose ending date? Type yes or no: ")	
-		
+	enddate_choice_fl=input("Choose ending date? Type yes or no: ")
+
 if enddate_choice_fl=="yes":
 	end_year = int(input("Ending year: "))
 	end_month = int(input("Ending month: "))
@@ -58,7 +59,7 @@ if enddate_choice_fl=="yes":
 	enddate = datetime.date(end_year, end_month, end_date)
 else:
 	enddate = datetime.date.today()-datetime.timedelta(days=1)
-	
+
 add_pitch = ("INSERT INTO pythonpfx.pitches "
 			"(retro_game_id, st_fl, regseason_fl, playoffs_fl, game_type, game_type_des, game_id, home_team_id, home_team_lg, away_team_id, away_team_lg,interleague_fl, bat_home_id, park_id, park_name, park_lock, pit_id, bat_id, pit_hand_cd, bat_hand_cd, pa_ball_ct, pa_strike_ct, outs_ct, pitch_seq, pa_terminal_fl, pa_event_cd, start_bases_cd, end_bases_cd, event_outs_ct, ab_number, pitch_res, pitch_des, pitch_id, x, y, start_speed, end_speed, sz_top, sz_bot, pfx_x, pfx_z, px, py, pz, x0, y0, z0, vx0, vy0, vz0, ax, ay, az, break_y, break_angle, break_length, pitch_type, type_conf, zone, spin_dir, spin_rate, sv_id)"
 			"VALUES (%(retro_game_id)s, %(st_fl)s, %(regseason_fl)s, %(playoffs_fl)s, %(game_type)s, %(game_type_des)s, %(game_id)s, %(home_team_id)s, %(home_team_lg)s, %(away_team_id)s, %(away_team_lg)s,%(interleague_fl)s, %(bat_home_id)s, %(park_id)s, %(park_name)s, %(park_lock)s, %(pit_id)s, %(bat_id)s, %(pit_hand_cd)s, %(bat_hand_cd)s, %(pa_ball_ct)s, %(pa_strike_ct)s, %(outs_ct)s, %(pitch_seq)s, %(pa_terminal_fl)s, %(pa_event_cd)s, %(start_bases_cd)s, %(end_bases_cd)s, %(event_outs_ct)s, %(ab_number)s, %(pitch_res)s, %(pitch_des)s, %(pitch_id)s, %(x)s, %(y)s, %(start_speed)s, %(end_speed)s, %(sz_top)s, %(sz_bot)s, %(pfx_x)s, %(pfx_z)s, %(px)s, %(py)s, %(pz)s, %(x0)s, %(y0)s, %(z0)s, %(vx0)s, %(vy0)s, %(vz0)s, %(ax)s, %(ay)s, %(az)s, %(break_y)s, %(break_angle)s, %(break_length)s, %(pitch_type)s, %(type_conf)s, %(zone)s, %(spin_dir)s, %(spin_rate)s, %(sv_id)s)")
@@ -83,7 +84,7 @@ for i in range(delta.days+1):
 		print("excepted")
 		d_url = prior_d_url
 	if d_url!=prior_d_url:
-		day_soup = BeautifulSoup(urlopen(d_url))
+		day_soup = BeautifulSoup(urlopen(d_url), 'html5lib')
 		for game in day_soup.find_all("a", href=re.compile("gid_.*")):
 			g = game.get_text().strip()
 			if type(game.get_text().strip()[len(game.get_text().strip())-2:len(game.get_text().strip())-1])==type(int(1)):
@@ -95,9 +96,9 @@ for i in range(delta.days+1):
 			st_fl="F"
 			regseason_fl="F"
 			playoff_fl="F"
-			if BeautifulSoup(urlopen(g_url),"lxml").find("a", href="game.xml"):
+			if BeautifulSoup(urlopen(g_url),"html5lib").find("a", href="game.xml"):
 #				time.sleep(1)
-				detail_soup = BeautifulSoup(urlopen(g_url+"game.xml"), "lxml")
+				detail_soup = BeautifulSoup(urlopen(g_url+"game.xml"), "html5lib")
 				if 'type' in detail_soup.game.attrs:
 					game_type = detail_soup.game["type"]
 				else:
@@ -174,9 +175,9 @@ for i in range(delta.days+1):
 				urlopen(inn_url)
 				tested_inn_url = inn_url
 			except:
-				continue					
-			for inning in BeautifulSoup(urlopen(tested_inn_url)).find_all("a", href=re.compile("inning_\d*.xml")):
-				inn_soup = BeautifulSoup(urlopen(inn_url+inning.get_text().strip()), "xml")
+				continue
+			for inning in BeautifulSoup(urlopen(tested_inn_url), "html5lib").find_all("a", href=re.compile("inning_\d*.xml")):
+				inn_soup = BeautifulSoup(urlopen(inn_url+inning.get_text().strip()), "html5lib")
 				inning_number = inn_soup.inning["num"]
 				top_outs = 0
 				bottom_outs = 0
@@ -419,7 +420,7 @@ for i in range(delta.days+1):
 							if pitch_res=="X" or ((pitch_res=="S" or pitch_res=="C") and event_cd==3 and strike_tally==2) or (ball_tally==3 and pitch_res=="B" and (event_cd==14 or event_cd==15)):
 								pa_terminal_fl="T"
 							else:
-								pa_terminal_fl="F"									
+								pa_terminal_fl="F"
 							if 'x' in pitch.attrs:
 								x=pitch["x"]
 								comp_ct+=1
@@ -814,7 +815,7 @@ for i in range(delta.days+1):
 							if pitch_res=="X" or ((pitch_res=="S" or pitch_res=="C") and event_cd==3 and strike_tally==2) or (pitch_res=="B" and (event_cd==14 or event_cd==15) and ball_tally==3):
 								pa_terminal_fl="T"
 							else:
-								pa_terminal_fl="F"									
+								pa_terminal_fl="F"
 							if 'x' in pitch.attrs:
 								x=pitch["x"]
 								comp_ct+=1
