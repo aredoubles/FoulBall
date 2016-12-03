@@ -29,6 +29,7 @@ Both approaches make sense to me, it just depends on the specific question that'
     * This model has a surprising accuracy of 95%!
     * Feature importance not as informative, though pitch location still matters
     * Should look into exactly how these individual features relate to pitch outcomes
+    * 'Type confidence' is a very interesting feature to me. In one sense, it's a purely technical features that reflects the clustering algorithms that PITCHfx uses. But it could also affect batters, and their confidence in reacting to a pitch, or their ability to make good contact. Will definitely want to look into this specific feature more.
 
 ## Issues
 * I have no idea how to deal with the pitch sequence data
