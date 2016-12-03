@@ -19,15 +19,16 @@ Both approaches make sense to me, it just depends on the specific question that'
     * Current model has an accuracy of ~0.5, which seems better than random chance (1/5 possible outcomes = 0.2)
         * Data is unbalanced though, need to look into this more.
     * Feature importance assessed
-        * Pitch location seems to matter a lot (though see below)
-            * Exactly what pitch locations lead to fouls will require further analysis.
+        * Pitch location seems to matter a lot
+            * Probably mostly for determing balls vs. strikes, less so for fouls
         * Other features that are somewhat important: velocity, release point (surprising), the batter involved, and the strike count
         * Interestingly, pitch types do not seem to matter! Only location. So that's interesting!
             * Also not important: batter/pitcher handedness, game situation, or park effects
 * Applied another Random forest classifier to predict just fouls vs. not-fouls
-    * Model re-balanced by calculating sample weights
-    * However, this model does not perform well, and does not out-perform random chance
-    * Unclear whether data needs to be rebalanced further, or if this is just a difficult prediction to make, given the features involved.
+    * Model re-balanced by calculating sample weights (not-fouls ~5x more frequently represented)
+    * This model has a surprising accuracy of 95%!
+    * Feature importance not as informative, though pitch location still matters
+    * Should look into exactly how these individual features relate to pitch outcomes
 
 ## Issues
 * I have no idea how to deal with the pitch sequence data
