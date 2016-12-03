@@ -12,15 +12,22 @@ Both approaches make sense to me, it just depends on the specific question that'
 * PitchFX data scraped from MLB's site using [this amazing parser](https://github.com/johnchoiniere/pfx_parser).
     * Some small changes needed to be made to the `pfx_parser_csv.py` script, hence my forked version in this repo.
 * For now, I've scraped every pitch thrown on Jun 1–3 2016. Will expand this more down the road.
-* Logging my progress in this repo's [Jupyter notebook file](`Pitch FX Exploration.ipynb`)
+* The column names and metadata for this PitchFX data was somewhat obtuse in the beginning, but I found a [nice glossary explaining all of the terms](https://fastballs.wordpress.com/2007/08/02/glossary-of-the-gameday-pitch-fields/), which was helped enormously.
+* Logging my progress in this repo's [Jupyter notebook file](Pitch FX Exploration.ipynb)
 * Categorical variables (ex: pitcher/batter handedness, pitch type, etc.) successfully encoded using `pd.get_dummies()`.
-* Applied a Random forest classification to predict pitch results (called/swinging strike, ball, foul, in-play, etc.)
-    * Current model has an accuracy of ~0.5, which is definitely better than random chance (1/5 possible outcomes = 0.2)
+* Applied a Random forest classification to predict all pitch outcomes (called/swinging strike, ball, foul, in-play, etc.)
+    * Current model has an accuracy of ~0.5, which seems better than random chance (1/5 possible outcomes = 0.2)
         * Data is unbalanced though, need to look into this more.
-        * Model is currently predicting all five of the possible outcomes. Could limit this to just foul balls, and not-foul balls.
-* Feature importance assessed
-    * Pitch location seems to matter a lot (though see below)
-        * Exactly what pitch locations lead to fouls will require further analysis.
+    * Feature importance assessed
+        * Pitch location seems to matter a lot (though see below)
+            * Exactly what pitch locations lead to fouls will require further analysis.
+        * Other features that are somewhat important: velocity, release point (surprising), the batter involved, and the strike count
+        * Interestingly, pitch types do not seem to matter! Only location. So that's interesting!
+            * Also not important: batter/pitcher handedness, game situation, or park effects
+* Applied another Random forest classifier to predict just fouls vs. not-fouls
+    * Model re-balanced by calculating sample weights
+    * However, this model does not perform well, and does not out-perform random chance
+    * Unclear whether data needs to be rebalanced further, or if this is just a difficult prediction to make, given the features involved.
 
 ## Issues
 * I have no idea how to deal with the pitch sequence data
@@ -30,8 +37,6 @@ Both approaches make sense to me, it just depends on the specific question that'
         * Seems like it would require a graph of some kind?
     * Too bad, because this does seem like it would be critical to the overall question...so what can be done?
     * Could this be overcome just by using an enormous dataset, and encoding it normally? I doubt it...
-* The PitchFX data is lacking metadata, and so the interpretation of some features is unclear to me right now
-    * ex: what are the precise differences between the x/px/x0/ax/pfx_x etc. features?
 
 ## Footnotes
 * Roger Shaw
