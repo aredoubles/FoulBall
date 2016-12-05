@@ -27,8 +27,8 @@ Both approaches make sense to me, it just depends on the specific question that'
     * Model re-balanced by calculating sample weights (not-fouls ~5x more frequently represented)
     * This model has a surprising accuracy of 95%!
     * Feature importance not as informative, though pitch location still matters
-        * Heat maps didn't reveal an obvious visual difference, underlining that it's a complex combination of features that determine pitch outcomes.
     * 'Type confidence' is a very interesting feature to me. In one sense, it's a purely technical features that reflects the clustering algorithms that PITCHf/x uses. But it could also affect batters, and their confidence in reacting to a pitch, or their ability to make good contact. Will definitely want to look into this specific feature more.
+    * Applied a Linear Discriminant Analysis to visualize the differences between pitch outcomes
 
 ## Issues
 * I have no idea how to deal with the pitch sequence data
